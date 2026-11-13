@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: payments
+data:
+  PORT: "8080"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payment-secret
+  namespace: payments
+type: Opaque
+stringData:
+  PAYMENT_GATEWAY_KEY: "demo-key-not-a-real-secret"

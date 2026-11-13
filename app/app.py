@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import uuid
 
 from flask import Flask, jsonify, request
@@ -8,6 +9,11 @@ from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("payment-service")
+
+GATEWAY_KEY = os.environ.get("PAYMENT_GATEWAY_KEY")
+if not GATEWAY_KEY:
+    log.error("PAYMENT_GATEWAY_KEY is not set, exiting")
+    sys.exit(1)
 
 PAYMENTS = Counter("payments_total", "Number of payment requests", ["status"])
 
