@@ -4,7 +4,7 @@ import sys
 import uuid
 
 from flask import Flask, jsonify, request
-from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -16,6 +16,7 @@ if not GATEWAY_KEY:
     sys.exit(1)
 
 PAYMENTS = Counter("payments_total", "Number of payment requests", ["status"])
+LATENCY = Histogram("payment_request_duration_seconds", "Time spent handling a payment request")
 
 
 def mask_card(number):
@@ -28,6 +29,7 @@ def health():
 
 
 @app.post("/pay")
+@LATENCY.time()
 def pay():
     data = request.get_json(silent=True) or {}
     card = str(data.get("card_number", ""))
